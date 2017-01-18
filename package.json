@@ -1,0 +1,27 @@
+{
+  "name": "@neoncity/togemfury",
+  "version": "0.0.0",
+  "description": "Pushes the current package to gemfury.",
+  "author": "NeonCity team",
+  "scripts": {},
+  "bin": {
+    "togemfury": "src/togemfury.sh"
+  },
+  "keywords": [
+    "gemfury",
+    "npm",
+    "push"
+  ],
+  "respository": {
+    "type": "git",
+    "url": "git+https://github.com/neoncity/togemfury.git"
+  },
+  "private": true,
+  "homepage": "https://github.com/neoncity/togemfury#readme",
+  "files": [
+    "src"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "devDependencies": {},
+}
