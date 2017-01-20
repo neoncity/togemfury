@@ -32,8 +32,24 @@ then
     exit 1
 fi
 
-npm pack
-curl -s -F package=@`ls ${GEMFURY_USER}-*.tgz` https://${GEMFURY_API_KEY}@push.fury.io/${GEMFURY_USER}/ > result
+# Skip `npm pack` and do the archiving ourselves. Include only the bare minimum and use a flater directory structure so imports will be easy.
+
+## Deep bash magick.
+PACKAGE_NAME=$(cat package.json | grep name | head -1 | awk -F: '{ print $2 }' | sed 's/[@",]//g' | sed 's|[/]|-|g') 
+PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g')
+PACKAGE=${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz
+
+mkdir __work__
+cp package.json __work__
+cp README.md __work__
+cp -r lib/src/* __work__
+cd __work__
+tar -cvzf ${PACKAGE} *
+cd ..
+mv __work__/${PACKAGE} .
+rm -rf __work__
+
+curl -s -F package=@${PACKAGE} https://${GEMFURY_API_KEY}@push.fury.io/${GEMFURY_USER}/ > result
 if [ -z "$(grep -e ok result)" ]
 then
     rm result

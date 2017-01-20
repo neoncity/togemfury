@@ -1,6 +1,6 @@
 {
   "name": "@neoncity/togemfury",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Pushes the current package to gemfury.",
   "author": "NeonCity team",
   "scripts": {},
