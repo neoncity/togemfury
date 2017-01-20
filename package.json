@@ -5,7 +5,7 @@
   "author": "NeonCity team",
   "scripts": {},
   "bin": {
-    "togemfury": "src/togemfury.sh"
+    "togemfury": "togemfury.sh"
   },
   "keywords": [
     "gemfury",

@@ -5,6 +5,10 @@ do
     key="$1"
 
     case $key in
+        -s|--src_root)
+            SRC_ROOT="$2"
+            shift # past argument
+            ;;
         -u|--user)
             GEMFURY_USER="$2"
             shift # past argument
@@ -19,6 +23,11 @@ do
     esac
     shift # past argument or value
 done
+
+if [[ -z ${SRC_ROOT} ]]
+then
+    SRC_ROOT=lib/src
+fi
 
 if [[ -z ${GEMFURY_USER} ]]
 then
@@ -42,7 +51,7 @@ PACKAGE=${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz
 mkdir __work__
 cp package.json __work__
 cp README.md __work__
-cp -r lib/src/* __work__
+cp -r ${SRC_ROOT}/* __work__
 cd __work__
 tar -cvzf ${PACKAGE} *
 cd ..
