@@ -44,9 +44,9 @@ fi
 # Skip `npm pack` and do the archiving ourselves. Include only the bare minimum and use a flater directory structure so imports will be easy.
 
 ## Deep bash magick.
-PACKAGE_NAME=$(cat package.json | grep name | head -1 | awk -F: '{ print $2 }' | sed 's/[@",]//g' | sed 's|[/]|-|g') 
-PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g')
-PACKAGE=${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz
+PACKAGE_NAME=$(cat package.json | grep name | head -1 | awk -F: '{ print $2 }' | sed 's/[@",]//g' | sed 's|[/]|-|g' | sed 's/ //g')
+PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | sed 's/ //g')
+PACKAGE="$PACKAGE_NAME-$PACKAGE_VERSION.tgz"
 
 mkdir __work__
 cp package.json __work__
