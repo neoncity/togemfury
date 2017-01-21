@@ -1,5 +1,11 @@
 #!/bin/bash
 
+ERR_NO_GEMFURY_USER=1
+ERR_NO_GEMFURY_API_KEY=2
+ERR_INVALID_F=3
+ERR_INVALID_E=4
+ERR_NO_UPLOAD=5
+
 while [[ $# -gt 1 ]]
 do
     key="$1"
@@ -23,13 +29,13 @@ done
 if [[ -z ${GEMFURY_USER} ]]
 then
     echo 'Need the --user argument'
-    exit 1
+    exit ${ERR_NO_GEMFURY_USER}
 fi
 
 if [[ -z ${GEMFURY_API_KEY} ]]
 then
     echo 'Need the --api_key argument'
-    exit 1
+    exit ${ERR_NO_GEMFURY_API_KEY}
 fi
 
 # Skip standard  `npm pack` and do the archiving ourselves. Include only the bare minimum and use a flater directory structure so imports will be easy.
@@ -53,7 +59,7 @@ do
         if ! [[ -f ${f} ]]
         then
            echo 'Source with f: is not actually a file'
-           exit 1
+           exit ${ERR_INVALID_F}
         fi
 
         if [[ ${f} = "README.md" ]]
@@ -77,7 +83,7 @@ do
         if ! [[ -d ${f} ]]
         then
             echo 'Source with e: is not actually a directory'
-            exit 1
+            exit ${ERR_INVALID_E}
         fi
 
         mkdir -p __work__/${DEST}
@@ -118,7 +124,7 @@ if [ -z "$(grep -e ok result)" ]
 then
     rm ${PACKAGE}
     rm result
-    exit 1
+    exit ${ERR_NO_UPLOAD}
 fi
 rm ${PACKAGE}
 rm result
