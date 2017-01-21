@@ -47,8 +47,10 @@ PACKAGE="$PACKAGE_NAME-$PACKAGE_VERSION.tgz"
 SAW_README=0
 SAW_PACKAGE=0
 
-rm -rf __work__
-mkdir __work__
+WORK_DIR=work.${RANDOM}
+
+rm -rf ${WORK_DIR}
+mkdir ${WORK_DIR}
 for f in $($(npm bin)/json -f package.json filesPack | $(npm bin)/json -ka)
 do
     ACTION_DEST=$($(npm bin)/json -f package.json filesPack[\"${f}\"])
@@ -72,12 +74,12 @@ do
             SAW_PACKAGE=1
         fi
 
-        mkdir -p __work__/$(dirname ${DEST})
-        cp ${f} __work__/$(dirname ${DEST})
+        mkdir -p ${WORK_DIR}/$(dirname ${DEST})
+        cp ${f} ${WORK_DIR}/$(dirname ${DEST})
     elif [[ ${ACTION} = c: ]]
     then
-        mkdir -p __work__/$(dirname ${DEST})
-        cp -r ${f} __work__/$(dirname ${DEST})
+        mkdir -p ${WORK_DIR}/$(dirname ${DEST})
+        cp -r ${f} ${WORK_DIR}/$(dirname ${DEST})
     elif [[ ${ACTION} = e: ]]
     then
         if ! [[ -d ${f} ]]
@@ -86,24 +88,24 @@ do
             exit ${ERR_INVALID_E}
         fi
 
-        mkdir -p __work__/${DEST}
-        cp -r ${f}/* __work__/${DEST}
+        mkdir -p ${WORK_DIR}/${DEST}
+        cp -r ${f}/* ${WORK_DIR}/${DEST}
     fi
 done
 
 if [[ ${SAW_README} = 0 ]]
 then
     echo 'Here'
-    cp README.md __work__
+    cp README.md ${WORK_DIR}
 fi
 
 if [[ ${SAW_PACKAGE} = 0 ]]
 then
     echo 'THere'
-    cp package.json __work__
+    cp package.json ${WORK_DIR}
 fi
 
-cd __work__
+cd ${WORK_DIR}
 
 ../node_modules/.bin/json -q -I -f package.json -e "this.files = []"
 for f in `ls`
@@ -115,9 +117,9 @@ npm pack
 
 cd ..
 
-mv __work__/${PACKAGE} .
+mv ${WORK_DIR}/${PACKAGE} .
 
-rm -rf __work__
+rm -rf ${WORK_DIR}
 
 curl -s  -F package=@${PACKAGE} https://${GEMFURY_API_KEY}@push.fury.io/${GEMFURY_USER}/ > result
 if [ -z "$(grep -e ok result)" ]
