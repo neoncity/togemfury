@@ -1,6 +1,6 @@
 {
   "name": "@neoncity/togemfury",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Pushes the current package to gemfury.",
   "author": "NeonCity team",
   "scripts": {},
@@ -18,11 +18,11 @@
   },
   "private": true,
   "homepage": "https://github.com/neoncity/togemfury#readme",
-  "files": [
-    "src/togemfury.sh",
-    "README.md",
-    "package.json"
-  ],
+  "filesPack": {
+    "src/togemfury.sh": "f:togemfury.sh",
+    "README.md": "f:README.md",
+    "package.json": "f:package.json"
+  },
   "license": "UNLICENSED",
   "dependencies": {
     "json": "^9.0.4"

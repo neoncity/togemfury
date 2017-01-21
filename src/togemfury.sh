@@ -38,15 +38,65 @@ PACKAGE_NAME=$($(npm bin)/json -f package.json name | sed 's/[@",]//g' | sed 's|
 PACKAGE_VERSION=$($(npm bin)/json -f package.json version | sed 's/[", ]//g')
 PACKAGE="$PACKAGE_NAME-$PACKAGE_VERSION.tgz"
 
+SAW_README=0
+SAW_PACKAGE=0
+
 rm -rf __work__
 mkdir __work__
-for ((i=0; i < $($(npm bin)/json -f package.json files.length); i+=1))
+for f in $($(npm bin)/json -f package.json filesPack | $(npm bin)/json -ka)
 do
-    cp $($(npm bin)/json -f package.json files[$i]) __work__
+    ACTION_DEST=$($(npm bin)/json -f package.json filesPack[\"${f}\"])
+    ACTION=${ACTION_DEST:0:2}
+    DEST=${ACTION_DEST:2}
+    if [[ ${ACTION} = f: ]]
+    then
+        if ! [[ -f ${f} ]]
+        then
+           echo 'Source with f: is not actually a file'
+           exit 1
+        fi
+
+        if [[ ${f} = "README.md" ]]
+        then
+            SAW_README=1
+        fi
+
+        if [[ ${f} = "package.json" ]]
+        then
+            SAW_PACKAGE=1
+        fi
+
+        mkdir -p __work__/$(dirname ${DEST})
+        cp ${f} __work__/$(dirname ${DEST})
+    elif [[ ${ACTION} = c: ]]
+    then
+        mkdir -p __work__/$(dirname ${DEST})
+        cp -r ${f} __work__/$(dirname ${DEST})
+    elif [[ ${ACTION} = e: ]]
+    then
+        if ! [[ -d ${f} ]]
+        then
+            echo 'Source with e: is not actually a directory'
+            exit 1
+        fi
+
+        mkdir -p __work__/${DEST}
+        cp -r ${f}/* __work__/${DEST}
+    fi
 done
-cp package.json __work__ # Always copy package.json
-cp README.md __work__ # Always copy README.md
-cd __work__
+
+if [[ ${SAW_README} = 0 ]]
+then
+    echo 'Here'
+    cp README.md __work__
+fi
+
+if [[ ${SAW_PACKAGE} = 0 ]]
+then
+    echo 'THere'
+    cp package.json __work__
+fi
+
 ../node_modules/.bin/json -q -I -f package.json -e "this.files = []"
 for f in `ls`
 do
