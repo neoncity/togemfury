@@ -22,4 +22,4 @@ script:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: ./src/togemfury.sh --src_root src --user ${GEMFURY_USER} --api_key ${GEMFURY_API_KEY}
+  script: ./src/togemfury.sh --user ${GEMFURY_USER} --api_key ${GEMFURY_API_KEY}

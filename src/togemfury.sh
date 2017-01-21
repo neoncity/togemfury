@@ -5,10 +5,6 @@ do
     key="$1"
 
     case $key in
-        -s|--src_root)
-            SRC_ROOT="$2"
-            shift # past argument
-            ;;
         -u|--user)
             GEMFURY_USER="$2"
             shift # past argument
@@ -23,11 +19,6 @@ do
     esac
     shift # past argument or value
 done
-
-if [[ -z ${SRC_ROOT} ]]
-then
-    SRC_ROOT=lib/src
-fi
 
 if [[ -z ${GEMFURY_USER} ]]
 then
@@ -47,11 +38,16 @@ PACKAGE_NAME=$($(npm bin)/json -f package.json name | sed 's/[@",]//g' | sed 's|
 PACKAGE_VERSION=$($(npm bin)/json -f package.json version | sed 's/[", ]//g')
 PACKAGE="$PACKAGE_NAME-$PACKAGE_VERSION.tgz"
 
+rm -rf __work__
 mkdir __work__
-cp package.json __work__
-cp README.md __work__
-cp -r ${SRC_ROOT}/* __work__
+for ((i=0; i < $($(npm bin)/json -f package.json files.length); i+=1))
+do
+    cp $($(npm bin)/json -f package.json files[$i]) __work__
+done
+cp package.json __work__ # Always copy package.json
+cp README.md __work__ # Always copy README.md
 cd __work__
+../node_modules/.bin/json -q -I -f package.json -e "this.files = []"
 for f in `ls`
 do
     ../node_modules/.bin/json -q -I -f package.json -e "this.files.push(\"${f}\")"
