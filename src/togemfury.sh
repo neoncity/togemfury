@@ -97,14 +97,20 @@ then
     cp package.json __work__
 fi
 
+cd __work__
+
 ../node_modules/.bin/json -q -I -f package.json -e "this.files = []"
 for f in `ls`
 do
     ../node_modules/.bin/json -q -I -f package.json -e "this.files.push(\"${f}\")"
 done
+
 npm pack
+
 cd ..
+
 mv __work__/${PACKAGE} .
+
 rm -rf __work__
 
 curl -s  -F package=@${PACKAGE} https://${GEMFURY_API_KEY}@push.fury.io/${GEMFURY_USER}/ > result
