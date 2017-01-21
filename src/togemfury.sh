@@ -41,11 +41,10 @@ then
     exit 1
 fi
 
-# Skip `npm pack` and do the archiving ourselves. Include only the bare minimum and use a flater directory structure so imports will be easy.
+# Skip standard  `npm pack` and do the archiving ourselves. Include only the bare minimum and use a flater directory structure so imports will be easy.
 
-## Deep bash magick.
-PACKAGE_NAME=$(cat package.json | grep name | head -1 | awk -F: '{ print $2 }' | sed 's/[@",]//g' | sed 's|[/]|-|g' | sed 's/ //g')
-PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | sed 's/ //g')
+PACKAGE_NAME=$($(npm bin)/json -f package.json name | sed 's/[@",]//g' | sed 's|[/]|-|g' | sed 's/ //g')
+PACKAGE_VERSION=$($(npm bin)/json -f package.json version | sed 's/[", ]//g')
 PACKAGE="$PACKAGE_NAME-$PACKAGE_VERSION.tgz"
 
 mkdir __work__
@@ -53,15 +52,21 @@ cp package.json __work__
 cp README.md __work__
 cp -r ${SRC_ROOT}/* __work__
 cd __work__
-tar -cvzf ${PACKAGE} *
+for f in `ls`
+do
+    ../node_modules/.bin/json -q -I -f package.json -e "this.files.push(\"${f}\")"
+done
+npm pack
 cd ..
 mv __work__/${PACKAGE} .
 rm -rf __work__
 
-curl -s -F package=@${PACKAGE} https://${GEMFURY_API_KEY}@push.fury.io/${GEMFURY_USER}/ > result
+curl -s  -F package=@${PACKAGE} https://${GEMFURY_API_KEY}@push.fury.io/${GEMFURY_USER}/ > result
 if [ -z "$(grep -e ok result)" ]
 then
+    rm ${PACKAGE}
     rm result
     exit 1
 fi
+rm ${PACKAGE}
 rm result
